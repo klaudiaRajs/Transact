@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Infrastructure.EventBus;
+using Infrastructure.IntegrationEvents;
 using Infrastructure.Messaging;
 using Transact.Core.Contracts;
 using Transact.Core.Transactions.Infrastructure;

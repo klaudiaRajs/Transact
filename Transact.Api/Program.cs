@@ -1,6 +1,4 @@
 using Infrastructure;
-using Infrastructure.EventBus;
-using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -48,7 +46,7 @@ builder.Services.AddProductsDependencies(productsConnectionString);
 var outboxConnectionString = builder.Configuration.GetConnectionString("OutboxDb");
 builder.Services.AddDbContext<OutboxDbContext>(options =>
     options.UseSqlServer(outboxConnectionString, b => b.MigrationsAssembly("Transact.Infrastructure")));
-builder.Services.AddOutboxDependencies(outboxConnectionString);
+builder.Services.AddOutboxDependencies(builder.Configuration, outboxConnectionString);
 
 var usersConnectionString = builder.Configuration.GetConnectionString("UsersDb");
 builder.Services.AddDbContext<UserDbContext>(options =>

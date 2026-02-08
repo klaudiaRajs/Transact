@@ -16,6 +16,6 @@ if (string.IsNullOrEmpty(connectionString))
 {
     throw new InvalidOperationException("OutboxDb connection string is not configured.");
 }
-builder.Services.AddOutboxDependencies(connectionString);
+builder.Services.AddOutboxDependencies(builder.Configuration, connectionString);
 
-builder.Build().Run();
+await builder.Build().RunAsync();
