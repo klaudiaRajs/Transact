@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transact.Api", "Transact.Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transact.Functions", "Transact.Functions\Transact.Functions.csproj", "{A35396FA-39A1-40CF-9541-64BEA64B5480}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transact.Orchestrator", "Transact.Orchestrator\Transact.Orchestrator.csproj", "{A128AB77-EFAC-46A4-BDA4-F06790B9B00E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +50,9 @@ Global
 		{A35396FA-39A1-40CF-9541-64BEA64B5480}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A35396FA-39A1-40CF-9541-64BEA64B5480}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A35396FA-39A1-40CF-9541-64BEA64B5480}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A128AB77-EFAC-46A4-BDA4-F06790B9B00E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A128AB77-EFAC-46A4-BDA4-F06790B9B00E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A128AB77-EFAC-46A4-BDA4-F06790B9B00E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A128AB77-EFAC-46A4-BDA4-F06790B9B00E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -15,16 +15,16 @@ public class InMemoryTransactionRepository(ILogger<InMemoryTransactionRepository
             var transaction = new Transaction
             {
                 Id = Guid.NewGuid().ToString(),
-                OwnerId = request.UserId,
+                OwnerId = "",
                 ProductsList = string.Join(",", request.ProductIds)
             };
 
             _transactions.Add(transaction);
-            logger.LogInformation($"[InMemory] Transaction created: {request.CorrelationId}");
+            logger.LogInformation($"[InMemory] Transaction created: {transaction.Id} for CorrelationId: ");
     
         } catch (Exception ex)
         {
-            logger.LogError(ex, $"[InMemory] Error creating transaction: {request.CorrelationId}");
+            logger.LogError(ex, $"[InMemory] Error creating transaction: ");
             return Task.FromResult(false);
         }
         

@@ -4,7 +4,7 @@ using Transact.Core.Products.Handlers;
 
 namespace Transact.Core.Products;
 
-public static class DependencyInjection
+public static class InjectDependencies
 {
     public static IServiceCollection AddProductsDependencies(
         this IServiceCollection services, string connectionString)

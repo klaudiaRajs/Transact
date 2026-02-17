@@ -11,6 +11,7 @@ using Transact.Core.Transactions;
 using Transact.Core.Transactions.Infrastructure;
 using Transact.Core.Users;
 using Transact.Core.Users.Infrastructure;
+using Transact.Orchestrator;
 using IProductService = Transact.Api2.Services.IProductService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +53,11 @@ var usersConnectionString = builder.Configuration.GetConnectionString("UsersDb")
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseSqlServer(usersConnectionString, b => b.MigrationsAssembly("Transact.Users.Core")));
 builder.Services.AddUsersDependencies(usersConnectionString);
+
+var orchestratorConnectionString = builder.Configuration.GetConnectionString("OrchestratorDb");
+builder.Services.AddDbContext<OrchestratorDbContext>(options =>
+    options.UseSqlServer(orchestratorConnectionString, b => b.MigrationsAssembly("Transact.Orchestrator")));
+builder.Services.AddOrchestratorDependencies(orchestratorConnectionString);
 
 // --- Other Services ---
 builder.Services.AddScoped<IProductFactory, ProductFactory>();

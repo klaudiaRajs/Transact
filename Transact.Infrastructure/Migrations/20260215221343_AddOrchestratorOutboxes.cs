@@ -6,24 +6,25 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialOutbox : Migration
+    public partial class AddOrchestratorOutboxes : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "TransactionsOutbox",
+                name: "OrchestratorOutbox",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OccurredOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ProcessedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Payload = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Payload = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CorrelationId = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Outbox", x => x.Id);
+                    table.PrimaryKey("PK_OrchestratorOutbox", x => x.Id);
                 });
         }
 
@@ -31,7 +32,7 @@ namespace Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "TransactionsOutbox");
+                name: "OrchestratorOutbox");
         }
     }
 }

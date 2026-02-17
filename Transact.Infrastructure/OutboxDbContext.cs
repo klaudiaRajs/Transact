@@ -5,5 +5,8 @@ namespace Infrastructure;
 
 public class OutboxDbContext(DbContextOptions<OutboxDbContext> options) : DbContext(options)
 {
-    public DbSet<OutboxItem> Outbox { get; set; }
+    public DbSet<TransactionOutboxItem> TransactionsOutbox { get; set; }
+    public DbSet<ProductOutboxItem> ProductsOutbox { get; set; }
+    public DbSet<UserOutboxItem> UsersOutbox { get; set; }
+    public DbSet<OrchestratorOutboxItem> OrchestratorOutbox { get; set; }
 }

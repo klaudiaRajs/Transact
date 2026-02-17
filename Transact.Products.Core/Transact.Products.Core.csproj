@@ -9,16 +9,15 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Transact.Contracts\Transact.Contracts.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Models\" />
+      <ProjectReference Include="..\Transact.Infrastructure\Transact.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="MediatR" Version="14.0.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.23" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.23" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.2" />
+      <PackageReference Include="RabbitMQ.Client" Version="7.2.0" />
     </ItemGroup>
 
 </Project>

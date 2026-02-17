@@ -27,7 +27,8 @@ public class CreateTransaction
         {
             return new BadRequestObjectResult("Invalid request payload.");
         }
-        var createTransactionRequest = new CreateTransactionRequest(body.UserId, body.ProductIds, "CreateTransactionCommand");
+        //TODO rozwikłać temat CreateTransactionRequest vs CreateTransactionIntegrationEvent 
+        var createTransactionRequest = new CreateTransactionRequest();
         var messageType = "CreateTransactionRequest";
         var result = await _outboxService.SaveOutboxItemAsync(createTransactionRequest, messageType);
         _logger.LogInformation("C# HTTP trigger function processed a request.");

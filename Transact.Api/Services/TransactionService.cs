@@ -1,19 +1,27 @@
+using Infrastructure.IntegrationEvents;
 using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Transact.Core.Contracts;
+using Transact.Core.Contracts.Infrastructure;
 using Transact.Core.Transactions.Infrastructure;
+using Transact.Orchestrator.Transaction;
 
 namespace Transact.Api2.Services;
 
-public class TransactionService(ITransactionFactory transactionFactory, IOutboxService outboxService, ILogger<TransactionService> logger) : ITransactionService
+public class TransactionService(
+    ITransactionFactory transactionFactory,
+    IOutboxService outboxService,
+    ILogger<TransactionService> logger) : ITransactionService
 {
-    public async Task<Transaction> CreateTransaction([FromBody]CreateTransactionRequest createOutboxRequest)
+    public async Task<Transaction> CreateTransaction([FromBody] CreateTransactionRequest createOutboxRequest)
     {
         try
         {
-            await outboxService.SaveOutboxItemAsync(createOutboxRequest, "CreateTransactionHandler");
-            return new Transaction(); 
-        } catch (Exception ex)
+            await outboxService.SaveOutboxItemAsync(createOutboxRequest,
+                ActionTypes.OrchestrateTransactionCreation);
+            return new Transaction();
+        }
+        catch (Exception ex)
         {
             logger.LogError(ex, "Error occurred while creating transaction.");
             throw;
@@ -22,12 +30,12 @@ public class TransactionService(ITransactionFactory transactionFactory, IOutboxS
 
     public Task<IEnumerable<Transaction>> GetAllTransactions()
     {
-        return transactionFactory.GetTransactions(); 
+        return transactionFactory.GetTransactions();
     }
-    
+
     public Task<Transaction> GetTransactionsById(int id)
     {
         var model = transactionFactory.GetTransaction(id, CancellationToken.None);
-        return model; 
+        return model;
     }
 }

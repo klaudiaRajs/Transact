@@ -1,7 +1,6 @@
 using System.Text;
 using Infrastructure.IntegrationEvents;
 using RabbitMQ.Client;
-using Transact.Core.Contracts;
 
 namespace Infrastructure;
 
@@ -12,8 +11,8 @@ public class RabbitMqEventBus(IConnection connection)
         try
         {
             await using var channel = await connection.CreateChannelAsync(cancellationToken: ct); 
-            await channel.ExchangeDeclareAsync(TransactionMessaging.Exchange, ExchangeType.Direct, durable: true, cancellationToken: ct);
-            await channel.BasicPublishAsync(exchange: TransactionMessaging.Exchange,
+            await channel.ExchangeDeclareAsync(@event.Exchange, ExchangeType.Direct, durable: true, cancellationToken: ct);
+            await channel.BasicPublishAsync(exchange: @event.Exchange,
                 routingKey: @event.RoutingKey,
                 body: Encoding.UTF8.GetBytes(@event.Payload),
                 ct);

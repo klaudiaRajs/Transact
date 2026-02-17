@@ -1,3 +1,4 @@
+using Infrastructure.IntegrationEvents;
 using Transact.Core.Contracts;
 
 namespace Transact.Api2.Services;

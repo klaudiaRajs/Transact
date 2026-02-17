@@ -2,17 +2,17 @@
 
 #nullable disable
 
-namespace Infrastructure.Migrations
+namespace Transact.Orchestrator.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCorrelationId : Migration
+    public partial class AddStatusFields : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "CorrelationId",
-                table: "TransactionsOutbox",
+                name: "Status",
+                table: "OrchestratorTransactions",
                 type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "");
@@ -22,8 +22,8 @@ namespace Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "CorrelationId",
-                table: "TransactionsOutbox");
+                name: "Status",
+                table: "OrchestratorTransactions");
         }
     }
 }

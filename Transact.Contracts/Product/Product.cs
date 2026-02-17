@@ -7,3 +7,5 @@ public class Product
     public decimal Price { get; set; }
     public bool InStock { get; set; }
 }
+
+

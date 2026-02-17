@@ -3,27 +3,28 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Infrastructure.Migrations
+namespace Transact.Orchestrator.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialOutbox : Migration
+    public partial class InitialOrchestrator : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "TransactionsOutbox",
+                name: "OrchestratorTransactions",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OccurredOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ProcessedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EventToRaise = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CorrelationId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ProcessedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Payload = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Outbox", x => x.Id);
+                    table.PrimaryKey("PK_OrchestratorTransactions", x => x.Id);
                 });
         }
 
@@ -31,7 +32,7 @@ namespace Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "TransactionsOutbox");
+                name: "OrchestratorTransactions");
         }
     }
 }

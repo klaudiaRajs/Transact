@@ -9,3 +9,19 @@ public class OutboxItem
     public string Payload { get; set; }
     public string CorrelationId { get; set; }
 }
+
+public class TransactionOutboxItem : OutboxItem
+{
+}
+
+public class UserOutboxItem : OutboxItem
+{
+}
+
+public class ProductOutboxItem : OutboxItem
+{
+}
+
+public class OrchestratorOutboxItem : OutboxItem
+{
+}

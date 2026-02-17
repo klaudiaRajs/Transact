@@ -11,18 +11,19 @@ public class SqlRepository(TransactionDbContext dbContext, ILogger<SqlRepository
     {
         try
         {
+            //Ta część to chyba powinna wyjść z adaptera. Tu tylko to co się różni
             var transaction = new Transaction
             {
                 Id = Guid.NewGuid().ToString(),
                 //OWNER jako snapshot 
-                OwnerId = request.UserId,
+                OwnerId = "equest.UserId",
                 ProductsList = JsonSerializer.Serialize(request.ProductIds)
             };
 
             //Jak user nie istnieje to machnij trigger do outboxa na utworzenie usera 
             dbContext.Transactions.Add(transaction);
             var result = await dbContext.SaveChangesAsync();
-            logger.LogInformation($"Saved transaction item to module db for: {request.CorrelationId}, service: {nameof(Transact.Core.Transactions)}");
+            logger.LogInformation($"Saved transaction item to module db for: , service: {nameof(Transact.Core.Transactions)}");
             return result.Equals(1);
         }
         catch (Exception ex)

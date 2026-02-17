@@ -6,7 +6,7 @@ using Transact.Core.Transactions.Infrastructure;
 
 namespace Transact.Core.Transactions;
 
-public class CreateTransactionHandler(ITransactionFactory factory) : IMessageHandler<CreateTransactionIntegrationEvent>
+public class CreateTransactionHandler(ITransactionFactory factory) : IMessageHandler<TriggerTransactionIntegrationEvent>
 {
     //CreateTransaction --> Create() 
     public string UserId { get; set; }
@@ -15,13 +15,11 @@ public class CreateTransactionHandler(ITransactionFactory factory) : IMessageHan
     public string MessageType { get; set; }
     public void CreateOnTransactionRequest(CreateTransactionRequest request)
     {
-        UserId = request.UserId;
         ProductIds = request.ProductIds;
-        CorrelationId = request.CorrelationId;
-        MessageType = request.MessageType;
+        //MessageType = request.MessageType;
     }
     
-    public Task HandleAsync(CreateTransactionIntegrationEvent message, CancellationToken ct)
+    public Task HandleAsync(TriggerTransactionIntegrationEvent message, CancellationToken ct)
     {
         factory.CreateTransaction(message.CreateTransactionRequest); 
         return Task.CompletedTask;

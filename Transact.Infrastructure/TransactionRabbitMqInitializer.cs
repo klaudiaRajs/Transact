@@ -9,26 +9,30 @@ public class TransactionRabbitMqInitializer(IConnection connection) : IHostedSer
     public async Task StartAsync(CancellationToken ct)
     {
         await using var channel = await connection.CreateChannelAsync(cancellationToken: ct);
+        await RunBinding(channel, ct, TransactionMessaging.Exchange, TransactionMessaging.Queue, TransactionMessaging.RoutingKey);
+        await RunBinding(channel, ct, OrchestratorMessaging.Exchange, OrchestratorMessaging.Queue, OrchestratorMessaging.RoutingKey);
+        await RunBinding(channel, ct, ProductMessaging.Exchange, ProductMessaging.Queue, ProductMessaging.RoutingKey);
+        
+        Console.WriteLine($"Connection open? {connection.IsOpen}");
+    }
 
+    private async Task RunBinding(IChannel channel, CancellationToken ct, string exchange, string queue, string routingKey)
+    {
         await channel.ExchangeDeclareAsync(
-            exchange: TransactionMessaging.Exchange,
+            exchange: exchange,
             type: ExchangeType.Direct,
             durable: true, cancellationToken: ct);
 
         await channel.QueueDeclareAsync(
-            queue: TransactionMessaging.Queue,
+            queue: queue,
             durable: true,
             exclusive: false,
             autoDelete: false, cancellationToken: ct);
 
         await channel.QueueBindAsync(
-            queue: TransactionMessaging.Queue,
-            exchange: TransactionMessaging.Exchange,
-            routingKey: TransactionMessaging.RoutingKey, cancellationToken: ct);
-        
-
-        Console.WriteLine($"Connection open? {connection.IsOpen}");
-
+            queue: queue,
+            exchange: exchange,
+            routingKey: routingKey, cancellationToken: ct);
     }
 
     public Task StopAsync(CancellationToken ct) => Task.CompletedTask;

@@ -11,7 +11,7 @@ public class DriveTransactionRepository(ILogger<DriveTransactionRepository> logg
         var transaction = new Transaction
         {
             Id = Guid.NewGuid().ToString(),
-            OwnerId = request.UserId,
+            OwnerId = "",
             ProductsList = request.ProductIds,
             UserSnapshot = null
         };

@@ -9,7 +9,7 @@ using Transact.Core.Transactions.Infrastructure;
 
 namespace Transact.Core.Transactions;
 
-public static class DependencyInjection
+public static class InjectDependency
 {
     public static IServiceCollection AddTransactionDependencies(
         this IServiceCollection services, string connectionString)
@@ -18,7 +18,7 @@ public static class DependencyInjection
             options.UseSqlServer(connectionString));
         services.AddScoped<ITransactionRepository, RepositoryAdapter>(); 
         services.AddScoped<
-            IMessageHandler<CreateTransactionIntegrationEvent>,
+            IMessageHandler<TriggerTransactionIntegrationEvent>,
             CreateTransactionHandler
         >();
         services.AddSingleton<IConnection>(sp =>
