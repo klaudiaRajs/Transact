@@ -8,6 +8,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Transact.Core.Contracts;
 using Transact.Core.Contracts.Infrastructure;
+using Transact.Core.Products.Infrastructure;
 
 namespace Transact.Core.Products;
 
@@ -28,7 +29,7 @@ public class ProductDetailsJobConsumer(IConnection connection, IServiceProvider 
             if (integrationEvent != null)
             {
                 using var scope = serviceProvider.CreateScope();
-                var repository = scope.ServiceProvider.GetRequiredService<ProductFactory>();
+                var repository = scope.ServiceProvider.GetRequiredService<IProductFactory>();
                 var outboxService = scope.ServiceProvider.GetRequiredService<IOutboxService>();
                 var productDetails = repository.GetProductsByIds(integrationEvent.ProductIds.Split(',').Select(int.Parse));
                 var productDetailsEvent = new ProductDetailsIntegrationEvent("integrationEvent.CorrelationId")
@@ -36,6 +37,7 @@ public class ProductDetailsJobConsumer(IConnection connection, IServiceProvider 
                     Payload = JsonSerializer.Serialize(productDetails),
                 };
                 await outboxService.SaveOutboxItemAsync(productDetailsEvent, ActionTypes.ReturnProductDetails); 
+                await channel.BasicAckAsync(ea.DeliveryTag, false, stoppingToken);
             }
 
             await channel.BasicAckAsync(ea.DeliveryTag, false, stoppingToken);

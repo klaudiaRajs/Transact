@@ -16,9 +16,9 @@ public static class InjectDependency
     {
         services.AddDbContext<TransactionDbContext>(options =>
             options.UseSqlServer(connectionString));
-        services.AddScoped<ITransactionRepository, RepositoryAdapter>(); 
+        services.AddScoped<ITransactionRepository, TransactionReporitory>(); 
         services.AddScoped<
-            IMessageHandler<TriggerTransactionIntegrationEvent>,
+            IMessageHandler<CreateTransactionIntegrationEvent>,
             CreateTransactionHandler
         >();
         services.AddSingleton<IConnection>(sp =>

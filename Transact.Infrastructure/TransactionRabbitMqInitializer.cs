@@ -12,6 +12,7 @@ public class TransactionRabbitMqInitializer(IConnection connection) : IHostedSer
         await RunBinding(channel, ct, TransactionMessaging.Exchange, TransactionMessaging.Queue, TransactionMessaging.RoutingKey);
         await RunBinding(channel, ct, OrchestratorMessaging.Exchange, OrchestratorMessaging.Queue, OrchestratorMessaging.RoutingKey);
         await RunBinding(channel, ct, ProductMessaging.Exchange, ProductMessaging.Queue, ProductMessaging.RoutingKey);
+        await RunBinding(channel, ct, UserMessaging.Exchange, UserMessaging.Queue, UserMessaging.RoutingKey);
         
         Console.WriteLine($"Connection open? {connection.IsOpen}");
     }
