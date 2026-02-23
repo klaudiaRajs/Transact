@@ -1,22 +1,16 @@
+using Infrastructure.IntegrationEvents;
 using Microsoft.Extensions.Logging;
 using Transact.Core.Contracts;
 using Transact.Core.Transactions.Infrastructure;
 
 namespace Transact.Core.Transactions.Repositories;
 
-public class DriveTransactionRepository(ILogger<DriveTransactionRepository> logger) : ITransactionRepository
+public class DriveAdapter(ILogger<DriveAdapter> logger) : ITransactionRepository
 {
-    public async Task<bool> CreateTransactionAsync(CreateTransactionRequest request)
+    public async Task<bool> CreateTransactionAsync(CreateTransactionIntegrationEvent request)
     {
-        var transaction = new Transaction
-        {
-            Id = Guid.NewGuid().ToString(),
-            OwnerId = "",
-            ProductsList = request.ProductIds,
-            UserSnapshot = null
-        };
         var filePath = Path.Combine(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.Parent!.Parent!.FullName, "Db", $"{Guid.NewGuid()}.json");
-        var jsonData = System.Text.Json.JsonSerializer.Serialize(transaction);
+        var jsonData = System.Text.Json.JsonSerializer.Serialize(request.Transaction);
         Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
         await File.WriteAllTextAsync(filePath, jsonData);
         

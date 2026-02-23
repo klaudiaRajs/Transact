@@ -1,26 +1,20 @@
+using Infrastructure.IntegrationEvents;
 using Microsoft.Extensions.Logging;
 using Transact.Core.Contracts;
 using Transact.Core.Transactions.Infrastructure;
 
 namespace Transact.Core.Transactions.Repositories;
 
-public class InMemoryTransactionRepository(ILogger<InMemoryTransactionRepository> logger) : ITransactionRepository
+public class InMemoryAdapter(ILogger<InMemoryAdapter> logger) : ITransactionRepository
 {
     private readonly List<Transaction> _transactions = new();
 
-    public Task<bool> CreateTransactionAsync(CreateTransactionRequest request)
+    public Task<bool> CreateTransactionAsync(CreateTransactionIntegrationEvent request)
     {
         try
         {
-            var transaction = new Transaction
-            {
-                Id = Guid.NewGuid().ToString(),
-                OwnerId = "",
-                ProductsList = string.Join(",", request.ProductIds)
-            };
-
-            _transactions.Add(transaction);
-            logger.LogInformation($"[InMemory] Transaction created: {transaction.Id} for CorrelationId: ");
+            _transactions.Add(request.Transaction);
+            logger.LogInformation($"[InMemory] Transaction created: {request.Transaction.Id} for CorrelationId: ");
     
         } catch (Exception ex)
         {

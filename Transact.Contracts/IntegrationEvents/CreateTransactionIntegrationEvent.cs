@@ -6,4 +6,6 @@ public class CreateTransactionIntegrationEvent(string CorrelationId) : Integrati
 {
     public List<Product> Products { get; set; } = new List<Product>();
     public User User { get; set; }
+
+    public Transaction? Transaction { get; set; }
 }

@@ -1,3 +1,4 @@
+using Infrastructure.IntegrationEvents;
 using MediatR;
 using Transact.Core.Contracts;
 using Transact.Core.Transactions.Infrastructure;
@@ -24,7 +25,7 @@ public class TransactionFactory (IMediator mediator, ITransactionRepository tran
         return transactions;
     }
 
-    public bool CreateTransaction(CreateTransactionRequest request)
+    public bool CreateTransaction(CreateTransactionIntegrationEvent request)
     {
         var result = transactionRepository.CreateTransactionAsync(request).Result;
         return result; 
