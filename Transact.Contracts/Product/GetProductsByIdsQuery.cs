@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace Transact.Core.Contracts;
+namespace Transact.Core.Contracts.Product;
 
 public class GetProductsByIdsQuery(IEnumerable<int> productIds) : IRequest<IEnumerable<Product>>
 {

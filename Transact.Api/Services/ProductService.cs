@@ -1,9 +1,10 @@
-using Transact.Core.Contracts;
-using Transact.Core.Products.Infrastructure;
+using Transact.Api2.Services.Interfaces;
+using Transact.Core.Contracts.Product;
+using Transact.Core.Products;
 
 namespace Transact.Api2.Services;
 
-public class ProductService(IProductFactory productFactory) : IProductService
+public class ProductService(ProductFactory productFactory) : IProductService
 {
     public Task<IEnumerable<Product>> GetProducts()
     {

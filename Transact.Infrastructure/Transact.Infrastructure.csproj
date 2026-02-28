@@ -24,6 +24,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Transact.Contracts\Transact.Contracts.csproj" />
+      <ProjectReference Include="..\Transact.Orchestrator\Transact.Orchestrator.csproj" />
+      <ProjectReference Include="..\Transact.Products.Core\Transact.Products.Core.csproj" />
+      <ProjectReference Include="..\Transact.Transactions.Core\Transact.Transactions.Core.csproj" />
+      <ProjectReference Include="..\Transact.Users.Core\Transact.Users.Core.csproj" />
     </ItemGroup>
 
 </Project>

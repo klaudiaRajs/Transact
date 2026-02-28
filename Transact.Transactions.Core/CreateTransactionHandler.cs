@@ -1,27 +1,20 @@
-using System.Text.Json.Serialization;
-using Infrastructure.IntegrationEvents;
-using Infrastructure.Messaging;
-using Transact.Core.Contracts;
+using Transact.Core.Contracts.Infrastructure;
+using Transact.Core.Contracts.IntegrationEvents;
 using Transact.Core.Transactions.Infrastructure;
 
 namespace Transact.Core.Transactions;
 
-public class CreateTransactionHandler(ITransactionFactory factory) : IMessageHandler<TriggerTransactionIntegrationEvent>
+public class CreateTransactionHandler(ITransactionFactory factory) : IMessageHandler<CreateTransactionIntegrationEvent>
 {
     //CreateTransaction --> Create() 
     public string UserId { get; set; }
     public string ProductIds { get; set; }
     public string CorrelationId { get; set; }
     public string MessageType { get; set; }
-    public void CreateOnTransactionRequest(CreateTransactionRequest request)
-    {
-        ProductIds = request.ProductIds;
-        //MessageType = request.MessageType;
-    }
     
-    public Task HandleAsync(TriggerTransactionIntegrationEvent message, CancellationToken ct)
+    public Task HandleAsync(CreateTransactionIntegrationEvent message, CancellationToken ct)
     {
-        factory.CreateTransaction(message.CreateTransactionRequest); 
+        factory.CreateTransaction(message); 
         return Task.CompletedTask;
     }
 }

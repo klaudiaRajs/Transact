@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
-using Transact.Core.Contracts;
+using Transact.Core.Contracts.Infrastructure;
 using Transact.Core.Users.Handlers;
 
 namespace Transact.Core.Users;
@@ -28,6 +28,7 @@ public static class DependencyInjection
         });
 
         services.AddHostedService<UserDetailsJobConsumer>(); 
+        services.AddScoped<GetOrCreateUserDetails>();
         return services;
     }
 }

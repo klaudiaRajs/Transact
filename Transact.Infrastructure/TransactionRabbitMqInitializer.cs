@@ -1,6 +1,9 @@
 using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
-using Transact.Core.Contracts;
+using Transact.Core.Contracts.Infrastructure;
+using Transact.Core.Contracts.Product;
+using Transact.Core.Contracts.Transaction;
+using Transact.Core.Contracts.User;
 
 namespace Infrastructure;
 

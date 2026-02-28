@@ -4,26 +4,22 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
 using Transact.Api2.Services;
-using Transact.Core.Contracts;
+using Transact.Api2.Services.Interfaces;
+using Transact.Core.Contracts.Transaction;
 using Transact.Core.Products;
-using Transact.Core.Products.Infrastructure;
 using Transact.Core.Transactions;
 using Transact.Core.Transactions.Infrastructure;
 using Transact.Core.Users;
-using Transact.Core.Users.Infrastructure;
 using Transact.Orchestrator;
-using IProductService = Transact.Api2.Services.IProductService;
+using IProductService = Transact.Api2.Services.Interfaces.IProductService;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- HTTP Client ---
 builder.Services.AddHttpClient();
 
-// --- Swagger & Endpoints ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// --- Serilog ---
 var loggerConnectionString = builder.Configuration.GetConnectionString("LoggerDb");
 Log.Logger = new LoggerConfiguration()
     .WriteTo.MSSqlServer(
@@ -32,7 +28,6 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 
-// --- DB Contexts & Dependencies ---
 var transactionsConnectionString = builder.Configuration.GetConnectionString("TransactionsDb");
 
 builder.Services.AddDbContext<TransactionDbContext>(options =>
@@ -45,7 +40,7 @@ builder.Services.AddDbContext<ProductDbContext>(options =>
 builder.Services.AddProductsDependencies(productsConnectionString);
 
 var outboxConnectionString = builder.Configuration.GetConnectionString("OutboxDb");
-builder.Services.AddDbContext<OutboxDbContext>(options =>
+builder.Services.AddDbContextFactory<OutboxDbContext>(options =>
     options.UseSqlServer(outboxConnectionString, b => b.MigrationsAssembly("Transact.Infrastructure")));
 builder.Services.AddOutboxDependencies(builder.Configuration, outboxConnectionString);
 
@@ -59,16 +54,14 @@ builder.Services.AddDbContext<OrchestratorDbContext>(options =>
     options.UseSqlServer(orchestratorConnectionString, b => b.MigrationsAssembly("Transact.Orchestrator")));
 builder.Services.AddOrchestratorDependencies(orchestratorConnectionString);
 
-// --- Other Services ---
-builder.Services.AddScoped<IProductFactory, ProductFactory>();
-builder.Services.AddScoped<IUserFactory, UserFactory>();
+builder.Services.AddScoped<ProductFactory>();
+builder.Services.AddScoped<UserFactory>();
 builder.Services.AddScoped<ITransactionFactory, TransactionFactory>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 
-// --- Middleware ---
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -77,9 +70,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// --- Product Endpoints ---
-
-// GET /product => all products
 app.MapGet("/product", async ([FromServices] IProductService productService) =>
 {
     var products = await productService.GetProducts();
@@ -88,22 +78,8 @@ app.MapGet("/product", async ([FromServices] IProductService productService) =>
 .WithName("GetAllProducts")
 .WithOpenApi();
 
-// GET /product/byIds?ids=1&ids=2
-/*app.MapGet("/product/byIds", async (
-        [FromQuery] IEnumerable<int> ids,
-        [FromServices] IProductService productService) =>
-{
-    var products = await productService.GetProductsByIds(ids);
-    return Results.Ok(products);
-})
-.WithName("GetProductsByIds")
-.WithOpenApi();*/
-
-// --- Transaction Endpoints ---
-
-// GET /transaction/{id}
-app.MapGet("/transaction/{id:int}", async (
-        int id,
+app.MapGet("/transaction/{id}", async (
+        string id,
         [FromServices] ITransactionService transactionService) =>
 {
     var transaction = await transactionService.GetTransactionsById(id);
@@ -112,7 +88,6 @@ app.MapGet("/transaction/{id:int}", async (
 .WithName("GetTransactionById")
 .WithOpenApi();
 
-// POST /transaction
 app.MapPost("/transaction", async (
         [FromBody] CreateTransactionRequest createTransactionRequest,
         [FromServices] ITransactionService transactionService) =>
@@ -132,5 +107,4 @@ app.MapGet("/transactions", async (
     .WithName("GetAllTransactions")
     .WithOpenApi();
 
-// --- Run ---
 await app.RunAsync();

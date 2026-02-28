@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Transact.Infrastructure\Transact.Infrastructure.csproj" />
         <ProjectReference Include="..\Transact.Transactions.Core\Transact.Transactions.Core.csproj" />
         <!-- inne Core projekty -->
     </ItemGroup>

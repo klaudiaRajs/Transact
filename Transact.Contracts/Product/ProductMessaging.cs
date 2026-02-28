@@ -1,4 +1,4 @@
-namespace Transact.Core.Contracts;
+namespace Transact.Core.Contracts.Product;
 
 public class ProductMessaging
 {

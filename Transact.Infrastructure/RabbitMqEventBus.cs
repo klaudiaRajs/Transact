@@ -1,12 +1,12 @@
 using System.Text;
-using Infrastructure.IntegrationEvents;
 using RabbitMQ.Client;
+using Transact.Core.Contracts.Infrastructure;
 
 namespace Infrastructure;
 
 public class RabbitMqEventBus(IConnection connection)
 {
-    public async Task PublishAsync(IntegrationEvent @event, CancellationToken ct)
+    public async Task PublishAsync(IIntegrationEvent @event, CancellationToken ct)
     {
         try
         {

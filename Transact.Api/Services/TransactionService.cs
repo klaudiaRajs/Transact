@@ -1,10 +1,10 @@
-using Infrastructure.IntegrationEvents;
 using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Transact.Core.Contracts;
 using Transact.Core.Contracts.Infrastructure;
+using Transact.Core.Contracts.Transaction;
+using Transact.Core.Contracts.Transactions;
 using Transact.Core.Transactions.Infrastructure;
-using Transact.Orchestrator.Transaction;
+using ITransactionService = Transact.Api2.Services.Interfaces.ITransactionService;
 
 namespace Transact.Api2.Services;
 
@@ -33,9 +33,9 @@ public class TransactionService(
         return transactionFactory.GetTransactions();
     }
 
-    public Task<Transaction> GetTransactionsById(int id)
+    public Task<Transaction> GetTransactionsById(string id)
     {
-        var model = transactionFactory.GetTransaction(id, CancellationToken.None);
+        var model = transactionFactory.GetTransaction(id);
         return model;
     }
 }

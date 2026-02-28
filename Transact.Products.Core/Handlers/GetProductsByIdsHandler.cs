@@ -1,10 +1,9 @@
 using MediatR;
-using Transact.Core.Contracts;
-using Transact.Core.Products.Infrastructure;
+using Transact.Core.Contracts.Product;
 
 namespace Transact.Core.Products.Handlers;
 
-public class GetProductsByIdsHandler(IProductFactory factory) : IRequestHandler<GetProductsByIdsQuery, IEnumerable<Product>>
+public class GetProductsByIdsHandler(ProductFactory factory) : IRequestHandler<GetProductsByIdsQuery, IEnumerable<Product>>
 {
     public async Task<IEnumerable<Product>> Handle(GetProductsByIdsQuery request, CancellationToken cancellationToken)
     {

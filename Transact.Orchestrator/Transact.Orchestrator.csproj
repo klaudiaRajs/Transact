@@ -20,7 +20,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Transact.Contracts\Transact.Contracts.csproj" />
-      <ProjectReference Include="..\Transact.Infrastructure\Transact.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

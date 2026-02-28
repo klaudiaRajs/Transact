@@ -1,33 +1,39 @@
-using Infrastructure.IntegrationEvents;
 using MediatR;
-using Transact.Core.Contracts;
+using Microsoft.Extensions.Logging;
+using Transact.Core.Contracts.Infrastructure;
+using Transact.Core.Contracts.Product;
+using Transact.Core.Contracts.Transactions;
+using Transact.Core.Contracts.User;
 using Transact.Core.Transactions.Infrastructure;
 
 namespace Transact.Core.Transactions;
 
-public class TransactionFactory (IMediator mediator, ITransactionRepository transactionRepository) : ITransactionFactory
+public class TransactionFactory(
+    ITransactionRepository transactionRepository,
+    ILogger<TransactionFactory> logger) : ITransactionFactory
 {
-    public async Task<Transaction> GetTransaction(int id, CancellationToken cancellationToken)
+    public async Task<Transaction> GetTransaction(string id)
     {
-        var owner = await mediator.Send(new GetUserQuery("userId_example"), cancellationToken);
-        var products = await mediator.Send(new GetProductsByIdsQuery(new List<int> { 1, 2, 3 }), cancellationToken);
-        return await Task.FromResult(new Transaction
-        {
-            Id =  Guid.NewGuid().ToString(), 
-            /*Owner = owner,
-            Products = products*/
-        });
+        return await transactionRepository.GetTransactionByIdAsync(id);
     }
-    
+
     public async Task<IEnumerable<Transaction>> GetTransactions()
     {
-        var transactions = await transactionRepository.GetTransactionsAsync(); 
+        var transactions = await transactionRepository.GetTransactionsAsync();
         return transactions;
     }
 
-    public bool CreateTransaction(CreateTransactionIntegrationEvent request)
+    public bool CreateTransaction(IIntegrationEvent createTransactionEvent)
     {
-        var result = transactionRepository.CreateTransactionAsync(request).Result;
-        return result; 
+        try
+        {
+            var result = transactionRepository.CreateTransactionAsync(createTransactionEvent).Result;
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error occurred while creating transaction.");
+            return false;
+        }
     }
 }

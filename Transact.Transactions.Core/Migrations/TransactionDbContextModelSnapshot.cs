@@ -21,18 +21,24 @@ namespace Transact.Core.Transactions.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Transact.Core.Contracts.Transaction", b =>
+            modelBuilder.Entity("Transact.Core.Contracts.Transactions.Transaction", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("OwnerId")
+                    b.Property<string>("CorrelationId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "UserId");
+
                     b.Property<string>("ProductsList")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "ProductIds");
 
                     b.Property<string>("UserSnapshot")
                         .HasColumnType("nvarchar(max)");

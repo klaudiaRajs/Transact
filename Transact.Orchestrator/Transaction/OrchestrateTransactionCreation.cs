@@ -1,6 +1,6 @@
 using System.Text.Json;
-using Transact.Core.Contracts;
 using Transact.Core.Contracts.Infrastructure;
+using Transact.Core.Contracts.Transaction;
 
 namespace Transact.Orchestrator.Transaction;
 
@@ -12,7 +12,7 @@ public class OrchestrateTransactionCreation(OrchestrateRepository repository)
         {
             var transaction = new OrchestratorTransaction
             {
-                //CorrelationId = payload.CorrelationId,
+                CorrelationId = Guid.NewGuid().ToString(),
                 Id = Guid.NewGuid().ToString(),
                 EventToRaise = "TransactionCreationRequested",
                 Payload = JsonSerializer.Serialize(payload)

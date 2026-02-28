@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Transact.Core.Contracts;
+namespace Transact.Core.Contracts.User;
 
 public class User
 {

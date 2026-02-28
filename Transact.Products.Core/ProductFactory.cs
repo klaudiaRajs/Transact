@@ -1,9 +1,8 @@
-using Transact.Core.Contracts;
-using Transact.Core.Products.Infrastructure;
+using Transact.Core.Contracts.Product;
 
 namespace Transact.Core.Products;
 
-public class ProductFactory : IProductFactory
+public class ProductFactory
 {
     public IEnumerable<Product> GetProducts()
     {
@@ -25,7 +24,8 @@ public class ProductFactory : IProductFactory
     public IEnumerable<Product> GetProductsByIds(IEnumerable<int> ids)
     {
         var allProducts = GetProducts().ToList();
-        return allProducts.Where((product, index) => ids.Contains(index + 1)).ToList();
+        var result =  allProducts.Where((product, index) => ids.Contains(index + 1)).ToList();
+        return result; 
     }
 }
 

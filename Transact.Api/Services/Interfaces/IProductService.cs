@@ -1,6 +1,6 @@
-using Transact.Core.Contracts;
+using Transact.Core.Contracts.Product;
 
-namespace Transact.Api2.Services;
+namespace Transact.Api2.Services.Interfaces;
 
 public interface IProductService
 {

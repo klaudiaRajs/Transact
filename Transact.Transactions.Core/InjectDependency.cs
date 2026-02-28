@@ -1,10 +1,9 @@
-using Infrastructure.IntegrationEvents;
-using Infrastructure.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
-using Transact.Core.Contracts;
+using Transact.Core.Contracts.Infrastructure;
+using Transact.Core.Contracts.IntegrationEvents;
 using Transact.Core.Transactions.Infrastructure;
 
 namespace Transact.Core.Transactions;
@@ -16,7 +15,8 @@ public static class InjectDependency
     {
         services.AddDbContext<TransactionDbContext>(options =>
             options.UseSqlServer(connectionString));
-        services.AddScoped<ITransactionRepository, TransactionReporitory>(); 
+        services.AddScoped<ITransactionRepository, TransactionRepository>();
+        services.AddScoped<ICreateTransaction, CreateTransaction>();
         services.AddScoped<
             IMessageHandler<CreateTransactionIntegrationEvent>,
             CreateTransactionHandler

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Transact.Core.Contracts;
+using Transact.Core.Contracts.User;
 
 namespace Transact.Core.Users;
 

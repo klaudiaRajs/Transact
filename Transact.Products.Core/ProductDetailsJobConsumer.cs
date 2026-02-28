@@ -1,14 +1,14 @@
 using System.Text;
 using System.Text.Json;
-using Infrastructure.IntegrationEvents;
 using Infrastructure.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using Transact.Core.Contracts;
 using Transact.Core.Contracts.Infrastructure;
-using Transact.Core.Products.Infrastructure;
+using Transact.Core.Contracts.IntegrationEvents;
+using Transact.Core.Contracts.Product;
+using Transact.Core.Contracts.Transaction;
 
 namespace Transact.Core.Products;
 
@@ -29,10 +29,10 @@ public class ProductDetailsJobConsumer(IConnection connection, IServiceProvider 
             if (integrationEvent != null)
             {
                 using var scope = serviceProvider.CreateScope();
-                var repository = scope.ServiceProvider.GetRequiredService<IProductFactory>();
+                var repository = scope.ServiceProvider.GetRequiredService<ProductFactory>();
                 var outboxService = scope.ServiceProvider.GetRequiredService<IOutboxService>();
                 var productDetails = repository.GetProductsByIds(integrationEvent.ProductIds.Split(',').Select(int.Parse));
-                var productDetailsEvent = new ProductDetailsIntegrationEvent("integrationEvent.CorrelationId")
+                var productDetailsEvent = new ProductDetailsIntegrationEvent()
                 {
                     Payload = JsonSerializer.Serialize(productDetails),
                 };

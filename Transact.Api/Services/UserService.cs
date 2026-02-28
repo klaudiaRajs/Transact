@@ -1,10 +1,10 @@
 using Transact.Api2.Services.Interfaces;
-using Transact.Core.Contracts;
-using Transact.Core.Users.Infrastructure;
+using Transact.Core.Contracts.User;
+using Transact.Core.Users;
 
 namespace Transact.Api2.Services;
 
-public class UserService(IUserFactory userFactory) : IUserService
+public class UserService(UserFactory userFactory) : IUserService
 {
 
     public Task<IEnumerable<User>> GetUsers()

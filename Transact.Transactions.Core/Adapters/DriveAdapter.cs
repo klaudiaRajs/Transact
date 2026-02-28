@@ -1,16 +1,18 @@
-using Infrastructure.IntegrationEvents;
 using Microsoft.Extensions.Logging;
-using Transact.Core.Contracts;
+using Transact.Core.Contracts.Infrastructure;
+using Transact.Core.Contracts.IntegrationEvents;
+using Transact.Core.Contracts.Transactions;
 using Transact.Core.Transactions.Infrastructure;
 
-namespace Transact.Core.Transactions.Repositories;
+namespace Transact.Core.Transactions.Adapters;
 
 public class DriveAdapter(ILogger<DriveAdapter> logger) : ITransactionRepository
 {
-    public async Task<bool> CreateTransactionAsync(CreateTransactionIntegrationEvent request)
+    public async Task<bool> CreateTransactionAsync(IIntegrationEvent request)
     {
+        var item = new CreateTransactionIntegrationEvent(request);
         var filePath = Path.Combine(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.Parent!.Parent!.FullName, "Db", $"{Guid.NewGuid()}.json");
-        var jsonData = System.Text.Json.JsonSerializer.Serialize(request.Transaction);
+        var jsonData = System.Text.Json.JsonSerializer.Serialize(item.Transaction);
         Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
         await File.WriteAllTextAsync(filePath, jsonData);
         
@@ -33,5 +35,10 @@ public class DriveAdapter(ILogger<DriveAdapter> logger) : ITransactionRepository
         }
 
         return transactions;
+    }
+
+    public Task<Transaction> GetTransactionByIdAsync(string id)
+    {
+        throw new NotImplementedException();
     }
 }

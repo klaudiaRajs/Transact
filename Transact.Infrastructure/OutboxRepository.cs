@@ -1,73 +1,98 @@
-using Infrastructure.IntegrationEvents;
 using Infrastructure.Interfaces;
-using Transact.Core.Contracts;
+using Microsoft.EntityFrameworkCore;
+using Transact.Core.Contracts.Infrastructure;
 
 namespace Infrastructure;
 
-public class OutboxRepository(OutboxDbContext dbContext) : IOutboxRepository
+
+public class OutboxRepository(IDbContextFactory<OutboxDbContext> factory) : IOutboxRepository
 {
-    public async Task<bool> SaveTransactionOutboxItem(CreateTransactionRequest item)
-    {
-        TransactionOutboxItem outboxItem = new TransactionOutboxItem()
-        {
-            Id = Guid.NewGuid().ToString(),
-            OccurredOn = DateTime.UtcNow,
-            //Type = item.MessageType,
-            Payload = System.Text.Json.JsonSerializer.Serialize(item), 
-        };
-        dbContext.TransactionsOutbox.Add(outboxItem);
-        var result = await dbContext.SaveChangesAsync(); 
-        return result.Equals(1);
-    }
-    
-    public async Task<bool> SaveProductOutboxItem(IntegrationEvent item)
+    public async Task<bool> SaveItemToOutbox(IIntegrationEvent item)
     {
         try
         {
-            ProductOutboxItem outboxItem = new ProductOutboxItem()
+            await using var dbContext = await factory.CreateDbContextAsync();
+            switch (item.EventType)
             {
-                Id = Guid.NewGuid().ToString(),
-                OccurredOn = DateTime.UtcNow,
-                Type = "ReturnProductDetails",
-                Payload = System.Text.Json.JsonSerializer.Serialize(item), 
-                CorrelationId = item.CorrelationId
-            };
-            dbContext.ProductsOutbox.Add(outboxItem);
-            var result = await dbContext.SaveChangesAsync(); 
+                case ActionTypes.UserRequested:
+                case ActionTypes.UserReturned:
+                    var userOutboxItem = new UserOutboxItem(item);
+                    dbContext.UsersOutbox.Add(userOutboxItem);
+                    break;
+                case ActionTypes.GetProductDetails:
+                case ActionTypes.ReturnProductDetails:
+                    var productOutboxItem = new ProductOutboxItem(item);
+                    dbContext.ProductsOutbox.Add(productOutboxItem);
+                    break;
+                case ActionTypes.OrchestrateTransactionCreation:
+                    var orchestratorOutboxItem = new OrchestratorOutboxItem(item);
+                    dbContext.OrchestratorOutbox.Add(orchestratorOutboxItem);
+                    break;
+            }
+
+            var result = await dbContext.SaveChangesAsync();
             return result.Equals(1);
-        } catch (Exception ex)
-        {
-            Console.WriteLine($"Error saving product outbox item: {ex.Message}");
-            return false;
         }
-    }
-    
-    public async Task<bool> SaveOrchestratorOutboxItem(IntegrationEvent item)
-    {
-        try
-        {
-            OrchestratorOutboxItem outboxItem = new OrchestratorOutboxItem()
-            {
-                Id = Guid.NewGuid().ToString(),
-                OccurredOn = DateTime.UtcNow,
-                Type = item.EventType,
-                Payload = System.Text.Json.JsonSerializer.Serialize(item), 
-                CorrelationId = item.CorrelationId
-            };
-            dbContext.OrchestratorOutbox.Add(outboxItem);
-            var result = await dbContext.SaveChangesAsync(); 
-            return result.Equals(1);
-        } catch (Exception ex)
+        catch (Exception ex)
         {
             Console.WriteLine($"Error saving product outbox item: {ex.Message}");
             return false;
         }
     }
 
-    public List<OutboxItem> GetAllUnprocessedMessages()
+    public async Task<bool> UpdateProcessedOnAsync(string messageId, IIntegrationEvent item)
     {
-        var result = new List<OutboxItem>(); 
-        result.AddRange(dbContext.TransactionsOutbox.Where(o => o.ProcessedOn == null).Select(a => new OutboxItem
+        try
+        {
+            await using var dbContext = await factory.CreateDbContextAsync();
+            switch (item.EventType)
+            {
+                case ActionTypes.UserRequested:
+                case ActionTypes.UserReturned:
+                    var userOutboxItem = dbContext.UsersOutbox.FirstOrDefault(a => a.Id == messageId);
+                    if (userOutboxItem != null)
+                    {
+                        userOutboxItem.ProcessedOn = DateTime.UtcNow;
+                        dbContext.UsersOutbox.Update(userOutboxItem);
+                    }
+
+                    break;
+                case ActionTypes.GetProductDetails:
+                case ActionTypes.ReturnProductDetails:
+                    var productOutboxItem = dbContext.ProductsOutbox.FirstOrDefault(a => a.Id == messageId);
+                    if (productOutboxItem != null)
+                    {
+                        productOutboxItem.ProcessedOn = DateTime.UtcNow;
+                        dbContext.ProductsOutbox.Update(productOutboxItem);
+                    }
+
+                    break;
+                case ActionTypes.OrchestrateTransactionCreation:
+                    var orchestratorOutboxItem = dbContext.OrchestratorOutbox.FirstOrDefault(a => a.Id == messageId);
+                    if (orchestratorOutboxItem != null)
+                    {
+                        orchestratorOutboxItem.ProcessedOn = DateTime.UtcNow;
+                        dbContext.OrchestratorOutbox.Update(orchestratorOutboxItem);
+                    }
+
+                    break;
+            }
+
+            var result = await dbContext.SaveChangesAsync();
+            return result >= 1;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating outbox item: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<List<OutboxItem>> GetAllUnprocessedMessages()
+    {
+        await using var dbContext = await factory.CreateDbContextAsync();
+        var result = new List<OutboxItem>();
+        result.AddRange(dbContext.ProductsOutbox.Where(o => o.ProcessedOn == null).Select(a => new OutboxItem
         {
             Id = a.Id,
             CorrelationId = a.CorrelationId,
@@ -75,7 +100,7 @@ public class OutboxRepository(OutboxDbContext dbContext) : IOutboxRepository
             Payload = a.Payload,
             Type = a.Type
         }).ToList());
-        result.AddRange(dbContext.ProductsOutbox.Where(o => o.ProcessedOn == null).Select(a => new OutboxItem
+        result.AddRange(dbContext.UsersOutbox.Where(o => o.ProcessedOn == null).Select(a => new OutboxItem
         {
             Id = a.Id,
             CorrelationId = a.CorrelationId,
@@ -91,18 +116,14 @@ public class OutboxRepository(OutboxDbContext dbContext) : IOutboxRepository
             Payload = a.Payload,
             Type = a.Type
         }).ToList());
-        return result;
-    }
-
-    public Task UpdateProcessedOnAsync(string messageId, DateTime utcNow)
-    {
-        Console.WriteLine($"Updating the item state in outbox for: {messageId} from OutboxRepository");
-        var outboxItem = dbContext.TransactionsOutbox.FirstOrDefault(o => o.Id == messageId);
-        if (outboxItem != null)
+        result.AddRange(dbContext.TransactionDataOutbox.Select(a => new TransactionDataOutboxItem
         {
-            outboxItem.ProcessedOn = utcNow;
-            return dbContext.SaveChangesAsync();
-        }
-        return Task.CompletedTask;
+            Id = a.Id,
+            CorrelationId = a.CorrelationId,
+            Payload = a.Payload,
+            OccurredOn = a.OccurredOn,
+            Type = a.Type
+        }).ToList());
+        return result;
     }
 }

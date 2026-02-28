@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace Transact.Core.Contracts;
+namespace Transact.Core.Contracts.User;
 
 public class GetUserQuery(string userId) : IRequest<User>
 {

@@ -1,42 +1,39 @@
-using System.Text.Json;
-using Infrastructure.IntegrationEvents;
 using Infrastructure.Interfaces;
+using Infrastructure.Messaging;
 using Microsoft.Extensions.Logging;
 using Quartz;
-using Transact.Core.Contracts;
-using Transact.Core.Contracts.Infrastructure;
+using Transact.Core.Contracts.IntegrationEvents;
 
 namespace Infrastructure;
 
 [DisallowConcurrentExecution]
 public class OutboxProcessorJob(
     IOutboxRepository outboxRepository,
-    RabbitMqEventBus dispatcher,
+    IDispatchMessage dispatcher,
     ILogger<OutboxProcessorJob> logger) : IJob
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        var messages = outboxRepository.GetAllUnprocessedMessages();
+        var messages = await  outboxRepository.GetAllUnprocessedMessages();
+        Console.WriteLine("I'm reading from outbox. I have: " + messages.Count() + " messages to process.");
         foreach (var message in messages)
         {
             //Azure + try catch - no no 
             //refactor 
             try
             {
-                var integrationEvent = new IntegrationEvent(message.CorrelationId)
+                var integrationEvent = new IntegrationEvent()
                 {
                     EventType = message.Type!,
                     OccurredAt = DateTime.UtcNow,
-                    Payload = message.Payload
+                    Payload = message.Payload, 
+                    CorrelationId = message.CorrelationId
                 };
 
-                integrationEvent = GetRoutingKeyAndExchange(integrationEvent, message.Type!);
+                //Dodaj handling jak coś nie wyjdzie 
+                await outboxRepository.UpdateProcessedOnAsync(message.Id, integrationEvent);
+                await dispatcher.Dispatch(integrationEvent, CancellationToken.None); 
 
-                await dispatcher.PublishAsync(
-                    integrationEvent,
-                    context.CancellationToken);
-
-                await outboxRepository.UpdateProcessedOnAsync(message.Id, DateTime.UtcNow);
                 logger.LogInformation(
                     $"Processed message and updated it's state for: {message.CorrelationId}, service: {nameof(Infrastructure)}");
             }
@@ -48,30 +45,6 @@ public class OutboxProcessorJob(
             }
         }
     }
-    //TODO move to RabbitMqEventBus
-    private static IntegrationEvent GetRoutingKeyAndExchange(IntegrationEvent integrationEvent, string messageType)
-    {
-        var routingKey = "";
-        var exchange = "";
-        switch (messageType)
-        {
-            case ActionTypes.CreateTransactionRequest:
-                routingKey = TransactionMessaging.RoutingKey;
-                exchange = TransactionMessaging.Exchange;
-                break;
-            case ActionTypes.OrchestrateTransactionCreation:
-            case ActionTypes.ReturnProductDetails:
-                routingKey = OrchestratorMessaging.RoutingKey;
-                exchange = OrchestratorMessaging.Exchange;
-                break;
-            case ActionTypes.GetProductDetails:
-                routingKey = ProductMessaging.RoutingKey;
-                exchange = ProductMessaging.Exchange;
-                break;
-        }
 
-        integrationEvent.RoutingKey = routingKey;
-        integrationEvent.Exchange = exchange;
-        return integrationEvent;
-    }
+   
 }

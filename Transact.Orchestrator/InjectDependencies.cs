@@ -13,6 +13,7 @@ public static class InjectDependencies
             options.UseSqlServer(connectionString));
         services.AddScoped<OrchestrateTransactionCreation>();
         services.AddScoped<OrchestrateRepository>();
+        services.AddScoped<OrchestrateTransaction>();
         services.AddHostedService<OrchestrateTransactionCreationJobConsumer>(); 
         return services;
     }

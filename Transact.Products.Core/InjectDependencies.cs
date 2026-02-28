@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
-using Transact.Core.Contracts;
+using Transact.Core.Contracts.Infrastructure;
 using Transact.Core.Products.Handlers;
 
 namespace Transact.Core.Products;
@@ -27,7 +27,9 @@ public static class InjectDependencies
             return factory.CreateConnectionAsync().GetAwaiter().GetResult();
         });
 
-        services.AddHostedService<ProductDetailsJobConsumer>(); 
+        services.AddHostedService<ProductDetailsJobConsumer>();
+        services.AddScoped<ProductFactory>(); 
+        services.AddScoped<GetProductDetails>(); 
         return services;
     }
 }

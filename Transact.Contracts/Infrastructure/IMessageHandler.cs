@@ -1,4 +1,4 @@
-namespace Infrastructure.Messaging;
+namespace Transact.Core.Contracts.Infrastructure;
 
 public interface IMessageHandler<in TMessage>
 {

@@ -4,7 +4,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Transact.Core.Contracts;
+using Transact.Core.Contracts.Transaction;
 
 namespace Transact.Functions;
 

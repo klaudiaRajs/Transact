@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Transact.Core.Contracts;
+namespace Transact.Core.Contracts.Transactions;
 
 public class Transaction
 {
@@ -10,4 +10,6 @@ public class Transaction
     public string? UserSnapshot { get; set; }
     [JsonPropertyName("ProductIds")]
     public string ProductsList { get; set; }
+
+    public string CorrelationId { get; set; }
 }

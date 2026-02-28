@@ -1,11 +1,12 @@
 using Infrastructure.Interfaces;
+using Infrastructure.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Quartz;
 using RabbitMQ.Client;
-using Transact.Core.Contracts;
+using Transact.Core.Contracts.Infrastructure;
 
 namespace Infrastructure;
 
@@ -18,7 +19,11 @@ public static class DependencyInjection
             options.UseSqlServer(connectionString));
         services.AddScoped<IOutboxRepository, OutboxRepository>();
         services.AddScoped<IOutboxService, OutboxService>();
-        services.AddHostedService<TransactionRabbitMqInitializer>(); 
+        services.AddHostedService<TransactionRabbitMqInitializer>();
+        services.AddScoped<RabbitMqAdapter>();
+        services.AddScoped<ProjectReferenceAdapter>();
+        services.AddScoped<MessageDispatcherAdapter>();
+        services.AddScoped<IDispatchMessage, DispatchMessage>();
         services.AddQuartz(configure =>
         {
             var jobKey = new JobKey(nameof(OutboxProcessorJob));
@@ -27,7 +32,7 @@ public static class DependencyInjection
                 .AddJob<OutboxProcessorJob>(jobKey, configureJob => configureJob.StoreDurably())
                 .AddTrigger(
                     trigger => trigger.ForJob(jobKey).WithSimpleSchedule(
-                        schedule => schedule.WithIntervalInSeconds(20).WithRepeatCount(10)));
+                        schedule => schedule.WithIntervalInSeconds(40).RepeatForever()));
 
             configure.UseMicrosoftDependencyInjectionJobFactory();
         });
